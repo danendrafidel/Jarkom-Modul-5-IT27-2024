@@ -340,3 +340,151 @@ iface eth0 inet dhcp
 ```
 
 ## SETUP
+
+### NewEridu
+
+- `nano setup.sh`
+
+```sh
+echo net.ipv4.ip_forward=1 > /etc/sysctl.conf
+sysctl -p
+
+ETH0_IP=$(ip -4 addr show eth0 | grep -oP '(?<=inet\s)\d+(\.\d+){3}')
+iptables -t nat -A POSTROUTING -o eth0 -j SNAT --to-source $ETH0_IP
+```
+
+### HDD (DNS SERVER)
+
+- `nano setup.sh`
+
+```sh
+export DEBIAN_FRONTEND=noninteractive
+apt update
+apt install bind9 netcat -y
+cp ~/named.conf.options /etc/bind/named.conf.options
+
+service bind9 restart
+
+#iptables -P INPUT DROP
+#iptables -A INPUT -s 10.77.2.11 -j ACCEPT
+#NOTES 10.77.2.11 adalah alamat IP dari fairy (DHCP)
+```
+
+- `nano named.conf.options`
+
+```
+options {
+        directory "/var/cache/bind";
+
+         forwarders {
+                192.168.122.1;
+         };
+
+        allow-query { any; };
+        auth-nxdomain no;
+
+        listen-on-v6 { any; };
+};
+
+```
+
+### Fairy (DHCP SERVER)
+
+- `nano setup.sh`
+
+```sh
+export DEBIAN_FRONTEND=noninteractive
+apt update
+apt install isc-dhcp-server netcat -y
+cp ~/dhcpd.conf /etc/dhcp/dhcpd.conf
+cp ~/isc-dhcp-server /etc/default/isc-dhcp-server
+echo INTERFACESv4=\"eth0\" >/etc/default/isc-dhcp-server
+service rsyslog start
+
+service isc-dhcp-server start
+#iptables -A INPUT -p icmp --icmp-type echo-request -j DROP //command buat no 2
+```
+
+- `nano isc-dhcp-server`
+
+```
+INTERFACESv4="eth0"
+```
+
+- `nano dhcpd.conf`
+
+```
+#A8
+subnet 10.77.2.64 netmask 255.255.255.192 {
+  range 10.77.2.66 10.77.2.125;
+  option routers 10.77.2.65;
+  option broadcast-address 10.77.2.126;
+  option domain-name-servers 10.77.2.10;
+  default-lease-time 600;
+  max-lease-time 7200;
+}
+
+#A4
+subnet 10.77.0.128 netmask 255.255.255.128 {
+  range 10.77.0.130 10.77.0.253;
+  option routers 10.77.0.129;
+  option broadcast-address 10.77.0.254;
+  option domain-name-servers 10.77.2.10;
+  default-lease-time 600;
+  max-lease-time 7200;
+}
+
+#A5
+subnet 10.77.1.0 netmask 255.255.255.0 {
+  range 10.77.1.2 10.77.1.253;
+  option routers 10.77.1.1;
+  option broadcast-address 10.77.1.254;
+  option domain-name-servers 10.77.2.10;
+  default-lease-time 600;
+  max-lease-time 7200;
+}
+
+#A7
+subnet 10.77.2.8 netmask 255.255.255.24 {
+}
+```
+
+### SixStreet, LuminaSquare, OuterRing, dan BalletTwins (DHCP RELAY)
+
+- `nano setup.sh`
+
+```sh
+
+echo net.ipv4.ip_forward=1 >/etc/sysctl.conf
+sysctl -p
+
+export DEBIAN_FRONTEND=noninteractive
+apt update
+apt install isc-dhcp-relay netcat -y
+cp ~/isc-dhcp-relay /etc/default/isc-dhcp-relay
+
+service isc-dhcp-relay start
+service rsyslog start
+```
+
+- `nano isc-dhcp-relay`
+
+```
+# Defaults for isc-dhcp-relay initscript
+# sourced by /etc/init.d/isc-dhcp-relay
+# installed at /etc/default/isc-dhcp-relay by the maintainer scripts
+
+#
+# This is a POSIX shell fragment
+#
+
+# What servers should the DHCP relay forward requests to?
+SERVERS="10.77.2.11"
+
+# On what interfaces should the DHCP relay (dhrelay) serve DHCP requests?
+INTERFACES="eth0 eth1 eth2 eth3"
+
+# Additional options that are passed to the DHCP relay daemon?
+OPTIONS=""
+
+```
