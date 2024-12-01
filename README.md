@@ -515,40 +515,35 @@ service apache2 restart
 
 ```conf
 <VirtualHost *:80>
-# The ServerName directive sets the request scheme, hostname and port that
-# the server uses to identify itself. This is used when creating
-# redirection URLs. In the context of virtual hosts, the ServerName
-# specifies what hostname must appear in the request's Host: header to
-# match this virtual host. For the default virtual host (this file) this
-# value is not decisive as it is used as a last resort host regardless.
-# However, you must set it for any further virtual host explicitly.
-#ServerName www.example.com
+    # The ServerName directive sets the request scheme, hostname, and port that
+    # the server uses to identify itself. This is used when creating
+    # redirection URLs. In the context of virtual hosts, the ServerName
+    # specifies what hostname must appear in the request's Host: header to
+    # match this virtual host. For the default virtual host (this file) this
+    # value is not decisive as it is used as a last resort host regardless.
+    # However, you must set it for any further virtual host explicitly.
+    # ServerName www.example.com
 
-ServerAdmin webmaster@localhost
-DocumentRoot /var/www/html
+    ServerAdmin webmaster@localhost
+    DocumentRoot /var/www/html
 
-# Available loglevels: trace8, ..., trace1, debug, info, notice, warn,
-# error, crit, alert, emerg.
-# It is also possible to configure the loglevel for particular
-# modules, e.g.
-#LogLevel info ssl:warn
+    # Available loglevels: trace8, ..., trace1, debug, info, notice, warn,
+    # error, crit, alert, emerg.
+    # It is also possible to configure the loglevel for particular
+    # modules, e.g.
+    # LogLevel info ssl:warn
 
-ErrorLog $ {
-  APACHE_LOG_DI
-}
-/error.log
-CustomLog $ {
-  APACHE_LOG_DI
-}
-/access.log combined
+    ErrorLog ${APACHE_LOG_DIR}/error.log
+    CustomLog ${APACHE_LOG_DIR}/access.log combined
 
-
-# For most configuration files from conf-available/, which are
-# enabled or disabled at a global level, it is possible to
-# include a line for only one particular virtual host. For example the
+    # For most configuration files from conf-available/, which are
+    # enabled or disabled at a global level, it is possible to
+    # include a line for only one particular virtual host. For example:
+    # Include conf-available/serve-cgi-bin.conf
 </VirtualHost>
 
 # vim: syntax=apache ts=4 sw=4 sts=4 sr noet
+
 ```
 
 - `nano index.html`
@@ -604,40 +599,35 @@ service apache2 restart
 
 ```conf
 <VirtualHost *:80>
-# The ServerName directive sets the request scheme, hostname and port that
-# the server uses to identify itself. This is used when creating
-# redirection URLs. In the context of virtual hosts, the ServerName
-# specifies what hostname must appear in the request's Host: header to
-# match this virtual host. For the default virtual host (this file) this
-# value is not decisive as it is used as a last resort host regardless.
-# However, you must set it for any further virtual host explicitly.
-#ServerName www.example.com
+    # The ServerName directive sets the request scheme, hostname, and port that
+    # the server uses to identify itself. This is used when creating
+    # redirection URLs. In the context of virtual hosts, the ServerName
+    # specifies what hostname must appear in the request's Host: header to
+    # match this virtual host. For the default virtual host (this file) this
+    # value is not decisive as it is used as a last resort host regardless.
+    # However, you must set it for any further virtual host explicitly.
+    # ServerName www.example.com
 
-ServerAdmin webmaster@localhost
-DocumentRoot /var/www/html
+    ServerAdmin webmaster@localhost
+    DocumentRoot /var/www/html
 
-# Available loglevels: trace8, ..., trace1, debug, info, notice, warn,
-# error, crit, alert, emerg.
-# It is also possible to configure the loglevel for particular
-# modules, e.g.
-#LogLevel info ssl:warn
+    # Available loglevels: trace8, ..., trace1, debug, info, notice, warn,
+    # error, crit, alert, emerg.
+    # It is also possible to configure the loglevel for particular
+    # modules, e.g.
+    # LogLevel info ssl:warn
 
-ErrorLog $ {
-  APACHE_LOG_DI
-}
-/error.log
-CustomLog $ {
-  APACHE_LOG_DI
-}
-/access.log combined
+    ErrorLog ${APACHE_LOG_DIR}/error.log
+    CustomLog ${APACHE_LOG_DIR}/access.log combined
 
-
-# For most configuration files from conf-available/, which are
-# enabled or disabled at a global level, it is possible to
-# include a line for only one particular virtual host. For example the
+    # For most configuration files from conf-available/, which are
+    # enabled or disabled at a global level, it is possible to
+    # include a line for only one particular virtual host. For example:
+    # Include conf-available/serve-cgi-bin.conf
 </VirtualHost>
 
 # vim: syntax=apache ts=4 sw=4 sts=4 sr noet
+
 ```
 
 - `nano index.html`
@@ -757,3 +747,65 @@ iptables -t nat -A POSTROUTING -o eth0 -j SNAT --to-source $ETH0_IP
     ![alt text](<img/Misi1No3 (4).png>)
 
 ### 4. Fairy mendeteksi aktivitas mencurigakan di server Hollow. Namun, berdasarkan peraturan polisi New Eridu, Hollow hanya boleh diakses pada hari Senin hingga Jumat dan hanya oleh faksi SoC (Burnice & Caesar) dan PubSec (Jane & Policeboo). Karena hari ini hari Sabtu, mereka harus menunggu hingga hari Senin. Gunakan curl untuk memastikan akses ini.
+
+- Pada HOLLOWZERO (WebServer) `bash setup.sh`
+
+  ![alt text](<img/Misi1No4 (1).png>)
+
+- Cek Website dengan `curl localhost`
+
+  ![alt text](<img/Misi1No4 (2).png>)
+
+- lalu `cat setup.sh` cek yang di command 3 teratas
+
+  ![alt text](<img/Misi1No4 (3).png>)
+
+- Kemudian `date` untuk senin-jumat buat liat tanggal sekarang, lalu jalanin 3 command iptables dibawah
+
+  ![alt text](<img/Misi1No4 (4).png>)
+
+- Coba ping di salah 1 client
+
+  ![alt text](<img/Misi1No4 (5).png>)
+
+- Kemudian ganti aturan agar sabtu bisa diakses, drop yang 10.77.2.64, lalu `iptables -D INPUT 2 iptables -A INPUT -s 10.77.2.64/26 -m time --weekdays Sat -j ACCEPT` allow buat hari sabtu
+
+  ![alt text](<img/Misi1No4 (6).png>)
+
+- Lalu test `ping 10.77.2.130` dan `curl 10.77.2.130` di client
+
+  ![alt text](<img/Misi1No4 (7).png>)
+
+  ![alt text](img/Misi1No4.png)
+
+### 5. Sembari menunggu, Fairy menyarankan Phaethon untuk berlatih di server HIA dan meminta bantuan dari faksi Victoria (Ellen & Lycaon) dan PubSec. Akses HIA hanya diperbolehkan untuk
+
+a. Ellen dan Lycaon pada jam 08.00-21.00.
+
+b. Jane dan Policeboo pada jam 03.00-23.00. (hak kepolisian)
+
+Gunakan Curl untuk memastikan akses ini.
+
+- Pertama `bash setup.sh` di HIA (WebServer)
+
+  ![alt text](<img/Misi1No5 (1).png>)
+
+- Kemudian `curl localhost`
+
+  ![alt text](<img/Misi1No5 (2).png>)
+
+- Lalu `cat setup.sh` untuk melihat 3 yang di command
+
+  ![alt text](<img/Misi1No5 (3).png>)
+
+- Masukkan command beriku di terminal `iptables -P INPUT DROP`, kemudian `iptables -A INPUT -s 10.77.0.128/25 -m time --timestart 08:00 --timestop 21:00 -j ACCEPT`, dan terkahir `iptables -A INPUT -s 10.77.1.0/24 -m time --timestart 03:00 --timestop 23:00 -j ACCEPT` sesuai yang diminta soal
+
+  ![alt text](<img/Misi1No5 (4).png>)
+
+- Kemudian coba test `curl 10.77.0.10`
+
+  - Pada client Policeboo
+    ![alt text](<img/Misi1No5 (5).png>)
+
+  - Pada client Lycaon
+    ![alt text](<img/Misi1No5 (6).png>)
