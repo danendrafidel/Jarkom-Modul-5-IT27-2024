@@ -645,6 +645,18 @@ service apache2 restart
 </html>
 ```
 
+### BurnIce (Client)
+
+```sh
+iptables -t nat -A PREROUTING -p tcp --dport 12345 -j DNAT --to-destination 10.77.2.130
+iptables -t nat -A POSTROUTING -p tcp --dport 12345 -j MASQUERADE
+
+#MISI3
+#iptables -P INPUT DROP
+#iptables -P OUTPUT DROP
+#iptables -P FORWARD DROP
+```
+
 ## PERSIAPAN
 
 - Pertama jalankan `bash setup.sh` pada NewEridu
@@ -839,3 +851,39 @@ c. Catat log dari iptables untuk keperluan analisis dan dokumentasikan dalam for
   Terblock
 
 ### 7. Hari Senin tiba, dan Fairy menyarankan membatasi akses ke server Hollow. Akses ke Hollow hanya boleh berasal dari 2 koneksi aktif dari 2 IP yang berbeda dalam waktu bersamaan.Burnice, Caesar, Jane, dan Policeboo diminta melakukan uji coba menggunakan curl.
+
+- `cat setup.sh` pada HOLLOWZERO (WebServer)
+
+  ![alt text](<img/Misi1No7 (1).png>)
+
+- Kemudian jalankan yang dicommand pada terminal
+
+  ![alt text](<img/Misi1No7 (3).png>)
+
+- Kemudian pindah ke Client disini saya milih Jane, kemudian `apt install` dan `apt install parallel -y`
+
+  ![alt text](<img/Misi1No7 (1).png>)
+
+- Setelah itu gunakan `parallel curl -s IP HOLLOWZERO ::: IPCAESAR IPBURNICE IPJANE IPPOLICEBOO` karena ini dhcp pasti akan berbeda-beda setiap percobaan
+
+  ![alt text](<img/Misi1No7 (4).png>)
+
+  ### 8. Selama uji coba, Fairy mendeteksi aktivitas mencurigakan dari Burnice. Setiap paket yang dikirim Fairy ke Burnice ternyata dialihkan ke HollowZero. Gunakan nc untuk memastikan alur pengalihan ini.
+
+- Masuk ke node Burnice (Client) kemudian `bash setup.sh`
+
+  ![alt text](<img/Misi1No8 (1).png>)
+
+- Kemudian `ifconfig eth0` di Client Burnice atau eth yang nyambung ke Burnice, lalu liat yang inet
+
+  ![alt text](<img/Misi1No8 (3).png>)
+
+- Buka HOLLOWZERO (WebServer) masukkan commandnya
+
+  ![alt text](<img/Misi1No8 (4).png>)
+
+- Setelah itu juga di FAIRy (DNS SERVER) masukkan command berikut untuk mengirim pesan
+
+  ![alt text](<img/Misi1No8 (5).png>)
+
+## MISI 3
