@@ -809,3 +809,33 @@ Gunakan Curl untuk memastikan akses ini.
 
   - Pada client Lycaon
     ![alt text](<img/Misi1No5 (6).png>)
+
+### 6. Sebagai bagian dari pelatihan, PubSec diminta memperketat keamanan jaringan di server HIA. Jane dan Policeboo melakukan simulasi port scan menggunakan nmap pada rentang port 1-100.
+
+a. Web server harus memblokir aktivitas scan port yang melebihi 25 port secara otomatis dalam rentang waktu 10 detik.
+
+b. Penyerang yang terblokir tidak dapat melakukan ping, nc, atau curl ke HIA.
+
+c. Catat log dari iptables untuk keperluan analisis dan dokumentasikan dalam format PDF.
+
+- `cat setup.sh` di HIA (WebServer)liat bagian yang dicommand dibawah
+
+  ![alt text](<img/Misi1No6 (5).png>)
+
+- `ping 10.77.0.10`dan `curl 10.77.0.10` di Client Policeboo, awalnya masi bisa
+
+  ![alt text](<img/Misi1No6 (4).png>)
+
+- Kemudian lakukan nmap dari Client Policeboo ke HIA ` nmap -p 1-100 10.77.0.10`
+
+  ![alt text](<img/Misi1No6 (3).png>)
+
+- Lalu coba `ping 10.77.0.10`dan `curl 10.77.0.10` kembali di client Policeboo
+
+  ![alt text](<img/Misi1No6 (1).png>)
+
+  ![alt text](<img/Misi1No6 (2).png>)
+
+  Terblock
+
+### 7. Hari Senin tiba, dan Fairy menyarankan membatasi akses ke server Hollow. Akses ke Hollow hanya boleh berasal dari 2 koneksi aktif dari 2 IP yang berbeda dalam waktu bersamaan.Burnice, Caesar, Jane, dan Policeboo diminta melakukan uji coba menggunakan curl.
