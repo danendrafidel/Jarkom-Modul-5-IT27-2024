@@ -11,6 +11,8 @@
 
 `10.77`
 
+## MISI 1
+
 ## TOPOLOGI GNS | VLSM |
 
 ![alt text](img/Topologi.png)
@@ -675,7 +677,7 @@ CustomLog $ {
 
   ![alt text](<img/Pesiapan (7).png>)
 
-## MISI 1
+## MISI 2
 
 ### 1. Agar jaringan di New Eridu bisa terhubung ke luar (internet), kalian perlu mengkonfigurasi routing menggunakan iptables. Namun, kalian tidak diperbolehkan menggunakan MASQUERADE
 
@@ -711,3 +713,47 @@ iptables -t nat -A POSTROUTING -o eth0 -j SNAT --to-source $ETH0_IP
 
   - Dari Luar Ke FairyS
     ![alt text](<img/Misi1No2 (5).png>)
+
+### 3. Selain itu, agar kejadian sebelumnya tidak terulang, hanya Fairy yang dapat mengakses HDD. Gunakan nc (netcat) untuk memastikan akses ini. [hapus aturan iptables setelah pengujian selesai agar internet tetap dapat diakses.
+
+- Ke DNS SERVER (HDD) terus `bash setup.sh`
+
+  ![alt text](<img/Misi1No3 (5).png>)
+
+- Lalu `cat setup.sh` terus cek yang dicommand
+
+  ![alt text](<img/Misi1No3 (6).png>)
+
+- Lalu cek dengan `iptables -L INPUT -n --line-numbers`
+
+  ![alt text](<img/Misi1No3 (7).png>)
+
+- Kemudian buat aturan untuk blok semua request `iptables -P INPUT DROP` kalo ada ipnya sebelumnya terus cek lagi `iptables -L INPUT -n --line-numbers`
+
+  ![alt text](<img/Misi1No3 (8).png>)
+
+- Setelah itu buat aturan agar hanya FAIRY (10.77.2.11) yang bisa akses
+
+  ![alt text](img/Misi1No3.png)
+
+- Test ping
+
+  - FAIRY ke HDD
+    ![alt text](<img/Misi1No3 (10).png>)
+
+  - Node lain ke HDD
+    ![alt text](<img/Misi1No3 (11).png>)
+
+- Test NetCat
+
+  - FAIRY ke HDD
+    ![alt text](<img/Misi1No3 (1).png>)
+
+    ![alt text](<img/Misi1No3 (2).png>)
+
+  - Node lain ke HDD
+    ![alt text](<img/Misi1No3 (3).png>)
+
+    ![alt text](<img/Misi1No3 (4).png>)
+
+### 4. Fairy mendeteksi aktivitas mencurigakan di server Hollow. Namun, berdasarkan peraturan polisi New Eridu, Hollow hanya boleh diakses pada hari Senin hingga Jumat dan hanya oleh faksi SoC (Burnice & Caesar) dan PubSec (Jane & Policeboo). Karena hari ini hari Sabtu, mereka harus menunggu hingga hari Senin. Gunakan curl untuk memastikan akses ini.
