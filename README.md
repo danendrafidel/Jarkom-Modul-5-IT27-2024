@@ -887,3 +887,39 @@ c. Catat log dari iptables untuk keperluan analisis dan dokumentasikan dalam for
   ![alt text](<img/Misi1No8 (5).png>)
 
 ## MISI 3
+
+### Mengetahui hal tersebut Wise dan Belle mengambil langkah drastis: memblokir semua lalu lintas masuk dan keluar dari Burnice, gunakan nc dan ping. Burnice ya bukan Caesar.
+
+### Sebelum Burnice sepenuhnya terisolasi, Fairy mengirimkan pesan moral:
+
+### “Kepercayaan adalah dasar dari jaringan yang aman. Jangan pernah mengkhianatinya.”
+
+- Pada Burnice (Client) `apt update`, kemudian `apt install netcat -y`
+
+- Lalu `nc -l -p 7777`
+
+  ![alt text](<img/Misi terakhir (1).png>)
+
+- Send message ke Burnice (Client) dari Fairy (DNS SERVER) `echo "Kepercayaan adalah dasar dari jaringan yang aman. Jangan per nah mengkhianatinya." | nc 10.77.2.66 7777`
+
+  ![alt text](<img/Misi terakhir (2).png>)
+
+- Output setelah `nc`di Burnice (Client)
+
+  ![alt text](<img/Misi terakhir (3).png>)
+
+- Kemudian di Burnice (Client) masukkan command berikut :
+
+```
+iptables -P INPUT DROP
+iptables -P OUTPUT DROP
+iptables -P FORWARD DROP
+```
+
+![alt text](<img/Misi Terakhir (4).png>)
+
+- Test ping di Fairy (DNS Server)
+
+  ![alt text](<img/Misi terakhir.png>)
+
+# SELESAI MODUL 5
