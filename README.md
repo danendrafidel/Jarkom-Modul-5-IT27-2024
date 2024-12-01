@@ -72,8 +72,6 @@ iface eth2 inet static
   address 10.77.0.5
   netmask 255.255.255.252
 
-iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE -s 10.77.0.0/16
-
 #A6
 post-up route add -net 10.77.2.0 netmask 255.255.255.248 gw 10.77.0.2
 
@@ -654,3 +652,62 @@ CustomLog $ {
   </body>
 </html>
 ```
+
+## PERSIAPAN
+
+- Pertama jalankan `bash setup.sh` pada NewEridu
+
+  ![alt text](<img/Pesiapan (2).png>)
+
+- Kemudian jalankan `bash setup.sh` pada DHCP SERVER (FAIRY)
+
+  ![alt text](<img/Pesiapan (3).png>)
+
+- Setelah itu jalankan `bash setup.sh` semua DHCP RELAY
+
+  ![alt text](<img/Pesiapan (4).png>)
+
+  ![alt text](<img/Pesiapan (5).png>)
+
+- Kemudian nyalakan node client dan DHCP berhasil
+
+  ![alt text](<img/Pesiapan (6).png>)
+
+  ![alt text](<img/Pesiapan (7).png>)
+
+## MISI 1
+
+### 1. Agar jaringan di New Eridu bisa terhubung ke luar (internet), kalian perlu mengkonfigurasi routing menggunakan iptables. Namun, kalian tidak diperbolehkan menggunakan MASQUERADE
+
+- Pada Konfigurasi New Eridu Tambahkan
+
+```
+ETH0_IP=$(ip -4 addr show eth0 | grep -oP '(?<=inet\s)\d+(\.\d+){3}')
+iptables -t nat -A POSTROUTING -o eth0 -j SNAT --to-source $ETH0_IP
+```
+
+- Lalu nyalakan node dan coba `ping google.com` di node bebas (misal di HollowZero)
+
+  ![alt text](img/Misi1No1.png)
+
+### 2. Karena Fairy adalah Al yang sangat berharga, kalian perlu memastikan bahwa tidak ada perangkat lain yang bisa melakukan ping ke Fairy. Tapi Fairy tetap dapat mengakses seluruh perangkat.
+
+- `cat setup.sh` pada DHCP SERVER (FAIRY) Kemudian copy yang dicommand
+
+  ![alt text](<img/Misi1No2 (1).png>)
+
+- Kemudian cek dengan `iptables -L INPUT -n --line-numbers
+
+  ![alt text](<img/Misi1No2 (2).png>)
+
+- Setelah itu jalankan `iptables -A INPUT -p icmp --icmp-type echo-request -j DROP` dan cek ulang degan `iptables -L INPUT -n --line-numbers`
+
+  ![alt text](<img/Misi1No2 (3).png>)
+
+- Kemudian coba ping 2 arah dari DHCP SERVER (FAIRY) dan 1nya node bebas
+
+  - Dari Fairy ke luar
+    ![alt text](<img/Misi1No2 (4).png>)
+
+  - Dari Luar Ke FairyS
+    ![alt text](<img/Misi1No2 (5).png>)
