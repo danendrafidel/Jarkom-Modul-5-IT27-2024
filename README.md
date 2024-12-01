@@ -235,7 +235,7 @@ iface eth0 inet static
 #A9
 auto eth1
 iface eth1 inet static
-  address 10.77.2.65
+  address 10.77.2.129
   netmask 255.255.255.252
 
 up echo nameserver 192.168.122.1 > /etc/resolv.conf
@@ -372,7 +372,7 @@ service bind9 restart
 
 - `nano named.conf.options`
 
-```
+```conf
 options {
         directory "/var/cache/bind";
 
@@ -407,13 +407,13 @@ service isc-dhcp-server start
 
 - `nano isc-dhcp-server`
 
-```
+```conf
 INTERFACESv4="eth0"
 ```
 
 - `nano dhcpd.conf`
 
-```
+```conf
 #A8
 subnet 10.77.2.64 netmask 255.255.255.192 {
   range 10.77.2.66 10.77.2.125;
@@ -469,7 +469,7 @@ service rsyslog start
 
 - `nano isc-dhcp-relay`
 
-```
+```conf
 # Defaults for isc-dhcp-relay initscript
 # sourced by /etc/init.d/isc-dhcp-relay
 # installed at /etc/default/isc-dhcp-relay by the maintainer scripts
@@ -487,4 +487,170 @@ INTERFACES="eth0 eth1 eth2 eth3"
 # Additional options that are passed to the DHCP relay daemon?
 OPTIONS=""
 
+```
+
+### HollowZero (WebServer)
+
+- `nano setup.sh`
+
+```sh
+export DEBIAN_FRONTEND=noninteractive
+apt update
+apt install apache2 -y
+cp ~/index.html /var/www/html/index.html
+cp ~/000-default.conf /etc/apache2/sites-available/000-default.conf
+service apache2 restart
+
+#iptables -P INPUT DROP
+#iptables -A INPUT -s 10.77.0.128/25 -m time --timestart 08:00 --timestop 21:00 -j ACCEPT
+#iptables -A INPUT -s 10.77.1.0/24 -m time --timestart 03:00 --timestop 23:00 -j ACCEPT
+
+# Allow only 2 active connections
+#iptables -A INPUT -p tcp --dport http -m conntrack --ctstate NEW -m recent --set
+#iptables -A INPUT -p tcp --dport http -m conntrack --ctstate NEW -m recent --update --seconds 1 --hitcount 3 -j REJECT
+#iptables -A INPUT -p tcp --dport http -j ACCEPT
+```
+
+- `nano 000-default.conf`
+
+```conf
+<VirtualHost *:80>
+# The ServerName directive sets the request scheme, hostname and port that
+# the server uses to identify itself. This is used when creating
+# redirection URLs. In the context of virtual hosts, the ServerName
+# specifies what hostname must appear in the request's Host: header to
+# match this virtual host. For the default virtual host (this file) this
+# value is not decisive as it is used as a last resort host regardless.
+# However, you must set it for any further virtual host explicitly.
+#ServerName www.example.com
+
+ServerAdmin webmaster@localhost
+DocumentRoot /var/www/html
+
+# Available loglevels: trace8, ..., trace1, debug, info, notice, warn,
+# error, crit, alert, emerg.
+# It is also possible to configure the loglevel for particular
+# modules, e.g.
+#LogLevel info ssl:warn
+
+ErrorLog $ {
+  APACHE_LOG_DI
+}
+/error.log
+CustomLog $ {
+  APACHE_LOG_DI
+}
+/access.log combined
+
+
+# For most configuration files from conf-available/, which are
+# enabled or disabled at a global level, it is possible to
+# include a line for only one particular virtual host. For example the
+</VirtualHost>
+
+# vim: syntax=apache ts=4 sw=4 sts=4 sr noet
+```
+
+- `nano index.html`
+
+```html
+<html>
+  <head> </head>
+
+  <body>
+    <h1>
+      Welcome to
+      <!--#echo var="SERVER NAME" -->
+    </h1>
+  </body>
+</html>
+```
+
+### HIA (WebServer)
+
+- `nano setup.sh`
+
+```sh
+export DEBIAN_FRONTEND=noninteractive
+apt update
+apt install apache2 -y
+cp ~/index.html /var/www/html/index.html
+cp ~/000-default.conf /etc/apache2/sites-available/000-default.conf
+service apache2 restart
+
+#iptables -P INPUT DROP
+#iptables -A INPUT -s 10.77.0.128/25 -m time --timestart 08:00 --timestop 21:00 -j ACCEPT
+#iptables -A INPUT -s 10.77.1.0/24 -m time --timestart 03:00 --timestop 23:00 -j ACCEPT
+
+#Create a chain for handling port scanning
+#iptables -N PORTSCAN
+
+#Detect and handle new connections to ports 1-100
+#iptables -I INPUT 1 -j LOG --log-prefix "PORT SCAN BRO: " --log-level 4 --log-tcp-options --log-ip-options
+#iptables -A INPUT -p tcp --dport 1:100 -m state --state NEW -m recent --set --name portscan
+#iptables -A INPUT -p tcp --dport 1:100 -m state --state NEW -m recent --update --seconds 10 --hitcount 25 --name portscan -j PORTSCAN
+
+#Log and block port-scanning IPs
+#iptables -A PORTSCAN -m recent --set --name blacklist
+#iptables -I PORTSCAN 1 -j LOG --log-prefix "PORT SCAN DETECTED: " --log-level 4 --log-tcp-options --log-ip-options
+#iptables -A PORTSCAN -j DROP
+
+#Block all further traffic from blacklisted IPs
+#iptables -A INPUT -m recent --name blacklist --rcheck -j DROP
+#iptables -A OUTPUT -m recent --name blacklist --rcheck -j DROP
+```
+
+- `nano 000-default.conf`
+
+```conf
+<VirtualHost *:80>
+# The ServerName directive sets the request scheme, hostname and port that
+# the server uses to identify itself. This is used when creating
+# redirection URLs. In the context of virtual hosts, the ServerName
+# specifies what hostname must appear in the request's Host: header to
+# match this virtual host. For the default virtual host (this file) this
+# value is not decisive as it is used as a last resort host regardless.
+# However, you must set it for any further virtual host explicitly.
+#ServerName www.example.com
+
+ServerAdmin webmaster@localhost
+DocumentRoot /var/www/html
+
+# Available loglevels: trace8, ..., trace1, debug, info, notice, warn,
+# error, crit, alert, emerg.
+# It is also possible to configure the loglevel for particular
+# modules, e.g.
+#LogLevel info ssl:warn
+
+ErrorLog $ {
+  APACHE_LOG_DI
+}
+/error.log
+CustomLog $ {
+  APACHE_LOG_DI
+}
+/access.log combined
+
+
+# For most configuration files from conf-available/, which are
+# enabled or disabled at a global level, it is possible to
+# include a line for only one particular virtual host. For example the
+</VirtualHost>
+
+# vim: syntax=apache ts=4 sw=4 sts=4 sr noet
+```
+
+- `nano index.html`
+
+```html
+<html>
+  <head> </head>
+
+  <body>
+    <h1>
+      Welcome to
+      <!--#echo var="SERVER NAME" -->
+    </h1>
+  </body>
+</html>
 ```
