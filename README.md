@@ -38,6 +38,8 @@
 
 ## PEMBAGIAN IP | VLSM |
 
+[Pembagian Subnet](https://docs.google.com/spreadsheets/d/12-e6GM9glKWTOOuJWDl-Ia3ztOqoeZ68b9QEw-7DgnA/edit?usp=sharing)
+
 | Subnet | Jumlah IP | Netmask | Network ID  | Broadcast   | Range IP                  | Subnet Mask     |
 | ------ | --------- | ------- | ----------- | ----------- | ------------------------- | --------------- |
 | A1     | 2         | /30     | 10.77.0.0   | 10.77.0.3   | 10.77.0.1 - 10.77.0.2     | 255.255.255.252 |
