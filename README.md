@@ -702,11 +702,11 @@ iptables -t nat -A POSTROUTING -o eth0 -j SNAT --to-source $ETH0_IP
 
   ![alt text](<img/Misi1No2 (1).png>)
 
-- Kemudian cek dengan `iptables -L INPUT -n --line-numbers
+- Kemudian cek dengan `iptables -L INPUT -n --line-numbers`
 
   ![alt text](<img/Misi1No2 (2).png>)
 
-- Setelah itu jalankan `iptables -A INPUT -p icmp --icmp-type echo-request -j DROP` dan cek ulang degan `iptables -L INPUT -n --line-numbers`
+- Setelah itu jalankan `iptables -A INPUT -p icmp --icmp-type echo-request -j DROP` untuk menutup akses node lain ke FAIRY dan cek ulang degan `iptables -L INPUT -n --line-numbers`
 
   ![alt text](<img/Misi1No2 (3).png>)
 
@@ -715,12 +715,12 @@ iptables -t nat -A POSTROUTING -o eth0 -j SNAT --to-source $ETH0_IP
   - Dari Fairy ke luar
     ![alt text](<img/Misi1No2 (4).png>)
 
-  - Dari Luar Ke FairyS
+  - Dari Luar Ke Fairy
     ![alt text](<img/Misi1No2 (5).png>)
 
 ### 3. Selain itu, agar kejadian sebelumnya tidak terulang, hanya Fairy yang dapat mengakses HDD. Gunakan nc (netcat) untuk memastikan akses ini. [hapus aturan iptables setelah pengujian selesai agar internet tetap dapat diakses.
 
-- Ke DNS SERVER (HDD) terus `bash setup.sh`
+- Ke DNS SERVER (HDD) lalu run `bash setup.sh`
 
   ![alt text](<img/Misi1No3 (5).png>)
 
@@ -728,27 +728,27 @@ iptables -t nat -A POSTROUTING -o eth0 -j SNAT --to-source $ETH0_IP
 
   ![alt text](<img/Misi1No3 (6).png>)
 
-- Lalu cek dengan `iptables -L INPUT -n --line-numbers`
+- Lalu cek dengan `iptables -L INPUT -n --line-numbers` untuk melihat tidak ada iptables yang aktif
 
   ![alt text](<img/Misi1No3 (7).png>)
 
-- Kemudian buat aturan untuk blok semua request `iptables -P INPUT DROP` kalo ada ipnya sebelumnya terus cek lagi `iptables -L INPUT -n --line-numbers`
+- Kemudian buat aturan untuk blok semua request (jika ada ip yang terdeteksi) `iptables -P INPUT DROP` , lalu cek lagi `iptables -L INPUT -n --line-numbers`
 
   ![alt text](<img/Misi1No3 (8).png>)
 
-- Setelah itu buat aturan agar hanya FAIRY (10.77.2.11) yang bisa akses
+- Setelah itu buat aturan agar hanya FAIRY (10.77.2.11) yang bisa akses HDD
 
   ![alt text](img/Misi1No3.png)
 
 - Test ping
 
-  - FAIRY ke HDD
+  - FAIRY ke HDD (harusnya bisa)
     ![alt text](<img/Misi1No3 (10).png>)
 
-  - Node lain ke HDD
+  - Node lain ke HDD (harusnya ga bisa)
     ![alt text](<img/Misi1No3 (11).png>)
 
-- Test NetCat
+- Test NetCat (untuk memastikan akses FAIRY ke HDD)
 
   - FAIRY ke HDD
     ![alt text](<img/Misi1No3 (1).png>)
